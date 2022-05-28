@@ -25,7 +25,14 @@ class Todo extends React.Component{
 	render(){
 		return (
 			<div>
-                <input  ref={this.inputRef} placeholder="enter todo title" type="text" onChange={e=>this.onInputChange(e)} value={this.state.inputValue}/>
+                <input  
+				ref={this.inputRef} 
+				placeholder="enter todo title" 
+				type="text" 
+				autoFocus
+				onChange={e=>this.onInputChange(e)}
+				value={this.state.inputValue}
+				/>
 				<button onClick={e=>this.onAddHandler(e)}>Add Todo</button>
 			</div>
 		)
