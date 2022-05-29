@@ -1,16 +1,21 @@
 import React from "react";
 import { Todo } from "./Todo";
+import { TodoList } from "./TodoList";
+import { TodosCount } from "./TodosCount";
+
+const url = 'http://localhost:3002'
 
 class Todos extends React.Component{
 	constructor(props){
 		super(props)
 		this.state = {
 			todos: [],
-            completed: false
+            completed: false,
 		}
 
-        this.url = 'http://localhost:3002';
 		this.onAdd = this.onAdd.bind(this);		
+		this.updateTodo = this.updateTodo.bind(this);		
+		this.deleteTodo = this.deleteTodo.bind(this);		
 	}
 
     processResponse(r) {
@@ -22,7 +27,7 @@ class Todos extends React.Component{
     }
 
     componentDidMount() {
-        fetch(this.url + '/todos', {
+        fetch(url + '/todos', {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -59,7 +64,7 @@ class Todos extends React.Component{
             'completed': false
         };
     
-        fetch(this.url + '/todos', {
+        fetch(url + '/todos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'
@@ -86,7 +91,7 @@ class Todos extends React.Component{
 	}
 
     deleteTodo(id) {
-        fetch(this.url + '/todos/' + id, {
+        fetch(url + '/todos/' + id, {
             method: 'DELETE',
 
         })
@@ -119,8 +124,8 @@ class Todos extends React.Component{
             'title': todo.title,
             'completed': !todo.completed
         };
-    
-        fetch(this.url + '/todos/'+todo.id, {
+            
+        fetch(url + '/todos/'+todo.id, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8'
@@ -129,12 +134,12 @@ class Todos extends React.Component{
         })
         .then(() => {
             this.setState({
-                completed: !this.state.completed
+                // completed: !this.state.completed
+                completed: todoEl.completed
             });
             this.componentDidMount();
         })
-        .catch(err => {
-
+        .catch(err => {        
             this.state.todos.forEach(todoKey => {
                 if(todoKey.id == todo.id){                    
                     todoKey.title = todoEl.title;
@@ -152,42 +157,19 @@ class Todos extends React.Component{
     checkEvenNumber(todoId){
         return todoId%2 ? 'odd' : 'even';
     }
-
-    getList(todo){
-
-        <button onClick={e=>this.onAddHandler(e)}>Add Todo</button>
-        let img = <input className="img" type="image" src="../trash.png" alt="trash" onClick={e=>this.deleteTodo(todo.id)}/>
-        let checkbox = <input type='checkbox' defaultChecked={this.state.completed} onChange={e=>this.updateTodo(todo)}/>
-        let todoStyle=todo.completed ? 'strikethrough':'';
-
-        return <li className={this.checkEvenNumber(todo.id)} key={todo.id}>
-                   <span className={todoStyle}>{todo.title}</span>
-                   {checkbox}
-                   {img}
-               </li>
-    }
-
-    header(){        
-        let h1 = <h1 className="head">HW - Simple Todo App</h1>    
-        return h1;
-    }
-
-    todoCount(todos){
-        return (
-            <div className="total-items">{`total items: ${todos.length}`}</div>
-        )
-    }
+   
 
 	render(){        
 		return (
-			<div>                 
-                {this.header()}
+			<div> 
                 <Todo onAdd={this.onAdd}/>
-                <hr/>
-				<ul>
-					{this.state.todos.map(todo=>this.getList(todo))}
-				</ul>
-                {this.todoCount(this.state.todos)}
+                <hr/>                
+               <TodoList 
+                   todos={this.state.todos} 
+                   updateTodo={this.updateTodo} 
+                   deleteTodo={this.deleteTodo}/>
+
+                <TodosCount count={this.state.todos.length}/>
 			</div>
 		)
 	}
