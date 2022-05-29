@@ -151,13 +151,7 @@ class Todos extends React.Component{
             this.componentDidMount();
             console.log(err);
         })
-    }
-    
-
-    checkEvenNumber(todoId){
-        return todoId%2 ? 'odd' : 'even';
-    }
-   
+    }  
 
 	render(){        
 		return (
