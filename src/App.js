@@ -1,6 +1,6 @@
 import React from "react";
 import { useState,useEffect } from "react";
-import { Header } from "./Components/Header";
+import Header from "./Components/Header";
 import Todos from "./Components/Todos";
 
 export default ()=>{
