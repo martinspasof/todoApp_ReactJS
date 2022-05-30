@@ -1,24 +1,16 @@
 import React from "react";
-import { Todo } from "./Todo";
+import { useState,useEffect } from "react";
+import Todo from "./Todo";
 import { TodoList } from "./TodoList";
 import { TodosCount } from "./TodosCount";
 
 const url = 'http://localhost:3002'
 
-class Todos extends React.Component{
-	constructor(props){
-		super(props)
-		this.state = {
-			todos: [],
-            completed: false,
-		}
+export default ()=>{
+    const [todos,setTodos] = useState( [] );
+    const [completed,setCompleted] = useState( false );    
 
-		this.onAdd = this.onAdd.bind(this);		
-		this.updateTodo = this.updateTodo.bind(this);		
-		this.deleteTodo = this.deleteTodo.bind(this);		
-	}
-
-    processResponse(r) {
+    const processResponse = (r) =>{
         if (r.status > 199 && r.status < 300) {
             return r.json()
         } else {
@@ -26,7 +18,7 @@ class Todos extends React.Component{
         }
     }
 
-    componentDidMount() {
+    const componentDidMount = () => {
         fetch(url + '/todos', {
             headers: {
                 'Content-Type': 'application/json',
@@ -34,31 +26,33 @@ class Todos extends React.Component{
             }
         })
         .then(res => {
-            return this.processResponse(res);
+            return processResponse(res);
         })
         .then(data => {
-            this.setState( { todos: [...data] });
-            this.saveToLocalStorage('todos', JSON.stringify(data));
+            setTodos( data );
+            saveToLocalStorage('todos', JSON.stringify(data));
         })
 		.catch(err => {
-			this.setState( { todos: [...this.readFromLocalStorage('todos')] });
+			setTodos( readFromLocalStorage('todos'));
 			console.log(err);
 		})
     }
 
-    saveToLocalStorage(key, value) {
+    useEffect(componentDidMount,[]);
+
+    const saveToLocalStorage = (key, value) => {
         // save to local storage
         let ls = window.localStorage;
         ls.setItem(key,value);
     }
 
-    readFromLocalStorage(key) {
+    const readFromLocalStorage = (key) => {
         // save to local storage
         let ls = window.localStorage;
         return JSON.parse(ls.getItem(key));
     }
 
-	onAdd(todoTitle){
+	const onAdd = (todoTitle) => {
         const newTodo = {
             'title': todoTitle,
             'completed': false
@@ -72,54 +66,55 @@ class Todos extends React.Component{
             body: JSON.stringify(newTodo)
         })
         .then(res => {
-            return this.processResponse(res);
+            return processResponse(res);
         })
         .then(todo => {                       
-            this.setState( {todos: [...this.state.todos, todo] });
-            this.saveToLocalStorage('todos', JSON.stringify([...this.state.todos, todo]));          
+            setTodos( [...todos, todo] );
+            saveToLocalStorage('todos', JSON.stringify([...todos, todo]));          
         })
         .catch(err => {           
             let idx= 1;
-            for(let el in this.state.todos){
-                this.state.todos[el].id = Number(idx++);
+            for(let el in todos){
+                todos[el].id = Number(idx++);
             }
-            newTodo.id = this.state.todos.length + 1;
-            this.setState( {todos: [...this.state.todos, newTodo] });
-            this.saveToLocalStorage('todos', JSON.stringify([...this.state.todos, newTodo]));
+            newTodo.id = todos.length + 1;
+            setTodos( [...todos, newTodo] );
+            saveToLocalStorage('todos', JSON.stringify([...todos, newTodo]));
             console.log(err);
         })	
 	}
 
-    deleteTodo(id) {
+    const deleteTodo = (id) => {        
         fetch(url + '/todos/' + id, {
-            method: 'DELETE',
-
+            method: 'DELETE'
         })
         .then(res => {
-            return this.processResponse(res);
+            return processResponse(res);
         })
         .then(() => {
-            this.componentDidMount();
+            componentDidMount();
         })
-        .catch(err => {
-            this.state.todos = this.state.todos.filter(function (todo, idx) {
+        .catch(err => {            
+            const filterTodos = todos.filter(function (todo, idx) {
                 todo.id = idx+1;
                 return todo.id != id;
             });
+
             let idx= 1;
-            for(let el in this.state.todos){
-                this.state.todos[el].id = Number(idx++);
+            const getFilterTodos = filterTodos;
+            for(let el in filterTodos){
+                getFilterTodos[el].id = Number(idx++);
             }
 
-            this.setState( {todos: [...this.state.todos] });
+            setTodos( getFilterTodos );
     
-            this.saveToLocalStorage('todos', JSON.stringify([...this.state.todos]));
-            this.componentDidMount();
+            saveToLocalStorage('todos', JSON.stringify(getFilterTodos));
+            componentDidMount();
             console.log(err);
         });
     }
 
-    updateTodo(todo) {
+    const updateTodo = (todo) => {
         const todoEl = {
             'title': todo.title,
             'completed': !todo.completed
@@ -133,40 +128,34 @@ class Todos extends React.Component{
             body: JSON.stringify(todoEl)
         })
         .then(() => {
-            this.setState({
-                // completed: !this.state.completed
-                completed: todoEl.completed
-            });
-            this.componentDidMount();
+            setCompleted(todoEl.completed);
+            componentDidMount();
         })
         .catch(err => {        
-            this.state.todos.forEach(todoKey => {
+            todos.forEach(todoKey => {
                 if(todoKey.id == todo.id){                    
                     todoKey.title = todoEl.title;
                     todoKey.completed = todoEl.completed;
                 }
             });
 
-            this.saveToLocalStorage('todos', JSON.stringify([...this.state.todos]));
-            this.componentDidMount();
+            saveToLocalStorage('todos', JSON.stringify(todos));
+            componentDidMount();
             console.log(err);
         })
     }  
 
-	render(){        
-		return (
-			<div> 
-                <Todo onAdd={this.onAdd}/>
-                <hr/>                
-               <TodoList 
-                   todos={this.state.todos} 
-                   updateTodo={this.updateTodo} 
-                   deleteTodo={this.deleteTodo}/>
-
-                <TodosCount count={this.state.todos.length}/>
-			</div>
-		)
-	}
+	       
+	return (
+		<div> 
+            <Todo onAdd={onAdd}/>
+            <hr/>                
+           <TodoList 
+               todos={todos} 
+               updateTodo={updateTodo} 
+               deleteTodo={deleteTodo}/>
+            <TodosCount count={todos.length}/>
+		</div>
+	)
+	
 }
-
-export {Todos}

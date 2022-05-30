@@ -5,9 +5,9 @@ const TodoList = (props) => {
         return todoId%2 ? 'odd' : 'even';
     }
 
-    const getList = (todo) => {
+    const getList = (todo, idx) => {
         return (            
-        <li className={checkEvenNumber(todo.id)} key={todo.id}>
+        <li className={checkEvenNumber(idx)} key={todo.id}>
         <span className={todo.completed ? 'strikethrough':''}>{todo.title}</span>
         <input type='checkbox' defaultChecked={todo.completed} onChange={(e)=>props.updateTodo(todo)}/>
         <input className="img" type="image" src="../trash.png" alt="trash" onClick={(e)=>props.deleteTodo(todo.id)}/>
@@ -18,7 +18,7 @@ const TodoList = (props) => {
 
 	return (
         <ul>
-        {props.todos.map(todo=>getList(todo))}
+        {props.todos.map((todo, idx)=>getList(todo, idx))}
         </ul>
 
 	)

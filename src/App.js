@@ -1,23 +1,15 @@
-import { render } from "@testing-library/react";
 import React from "react";
+import { useState,useEffect } from "react";
 import { Header } from "./Components/Header";
-import { Todos } from "./Components/Todos";
+import Todos from "./Components/Todos";
 
-class App extends React.Component{  
-  constructor(props){
-    super(props);
-    this.appName = "HW - Simple Todo App";
-  }
-
-  render(){
+export default ()=>{
+  const [appName] = useState('HW - Simple Todo App with Hooks');
+  
     return (
       <div className="App">
-        <Header appName={this.appName}/>
+        <Header appName={appName}/>
         <Todos/>
       </div>
     )
-  }
-
 }
-
-export default App;

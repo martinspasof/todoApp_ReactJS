@@ -1,42 +1,33 @@
 import React from "react";
+import { useState,useEffect } from "react";
 
-class Todo extends React.Component{
-	constructor(props){
-		super(props)
-		this.state = {
-			'inputValue':''
-		}
+export default (props)=>{
+	const [input,setInput] = useState( '' );
+	const inputRef = React.createRef();
 
-		this.inputRef = React.createRef();
+	const onInputChange = (e) => {
+		setInput(e.target.value);
 	}
 
-	onInputChange(e){
-		this.setState( {
-			inputValue:e.target.value
-		})
+	const onAddHandler = (e) => {
+		props.onAdd(input);
+		setInput('');
+		inputRef.current.focus();
 	}
 
-	onAddHandler(e){
-		this.props.onAdd(this.state.inputValue)
-		this.setState({inputValue: ''});
-		this.inputRef.current.focus();
-	}
-
-	render(){
-		return (
-			<div>
-                <input  
-				ref={this.inputRef} 
-				placeholder="enter todo title" 
-				type="text" 
-				autoFocus
-				onChange={e=>this.onInputChange(e)}
-				value={this.state.inputValue}
-				/>
-				<button onClick={e=>this.onAddHandler(e)}>Add Todo</button>
-			</div>
-		)
-	}
+	
+	return (
+		<div>
+            <input  
+			ref={inputRef} 
+			placeholder="enter todo title" 
+			type="text" 
+			autoFocus
+			onChange={e=>onInputChange(e)}
+			value={input}
+			/>
+			<button onClick={e=>onAddHandler(e)}>Add Todo</button>
+		</div>
+	)
+	
 }
-
-export {Todo}

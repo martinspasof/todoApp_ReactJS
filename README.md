@@ -1,5 +1,5 @@
-## todoApp_ReactJS
-# React demos TodoApp
+## Func_TodoApp_ReactJS
+# Simple Todo App with Hooks
 
 # Getting Started with Create React App
 
